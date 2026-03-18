@@ -10,13 +10,19 @@ async function initWasm() {
     console.log('Stash WASM initialized');
   } catch (error) {
     console.error('Failed to initialize WASM:', error);
-    document.getElementById('app').innerHTML = `
-      <div class="error">
-        <h2>Failed to load Stash</h2>
-        <p>${error.message}</p>
-        <button onclick="location.reload()">Retry</button>
-      </div>
-    `;
+    const app = document.getElementById('app');
+    app.textContent = '';
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error';
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Failed to load Stash';
+    const p = document.createElement('p');
+    p.textContent = error.message;
+    const btn = document.createElement('button');
+    btn.textContent = 'Retry';
+    btn.addEventListener('click', () => location.reload());
+    errorDiv.append(h2, p, btn);
+    app.appendChild(errorDiv);
   }
 }
 

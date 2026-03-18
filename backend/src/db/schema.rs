@@ -21,7 +21,7 @@ pub fn migrate(conn: &Connection) -> DbResult<()> {
         )
         .unwrap_or(0);
 
-    if current_version < 1 {
+    if current_version < SCHEMA_VERSION {
         migrate_v1(conn)?;
     }
 

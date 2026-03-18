@@ -8,8 +8,6 @@ use thiserror::Error;
 pub enum FetchError {
     #[error("Request failed: {0}")]
     Request(#[from] reqwest::Error),
-    #[error("Invalid URL: {0}")]
-    InvalidUrl(String),
     #[error("Content type not supported: {0}")]
     UnsupportedContentType(String),
 }
@@ -20,7 +18,6 @@ pub type FetchResult<T> = Result<T, FetchError>;
 pub struct FetchedPage {
     pub html: String,
     pub final_url: String,
-    pub content_type: Option<String>,
 }
 
 /// HTTP client for fetching URLs
@@ -68,10 +65,6 @@ impl Fetcher {
         let final_url = response.url().to_string();
         let html = response.text().await?;
 
-        Ok(FetchedPage {
-            html,
-            final_url,
-            content_type,
-        })
+        Ok(FetchedPage { html, final_url })
     }
 }

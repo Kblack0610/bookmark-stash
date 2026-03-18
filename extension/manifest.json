@@ -18,8 +18,7 @@
     "default_title": "Stash - Reading List"
   },
   "background": {
-    "scripts": ["background.js"],
-    "type": "module"
+    "scripts": ["background.js"]
   },
   "commands": {
     "save-page": {
