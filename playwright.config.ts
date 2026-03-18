@@ -16,8 +16,8 @@ export default defineConfig({
         // Load extension in Chromium
         launchOptions: {
           args: [
-            `--disable-extensions-except=${path.join(__dirname, 'extension')}`,
-            `--load-extension=${path.join(__dirname, 'extension')}`,
+            `--disable-extensions-except=${path.join(__dirname, 'dist', 'chromium-extension')}`,
+            `--load-extension=${path.join(__dirname, 'dist', 'chromium-extension')}`,
           ],
         },
       },

@@ -18,8 +18,7 @@
     "default_title": "Stash - Reading List"
   },
   "background": {
-    "scripts": ["background.js"],
-    "type": "module"
+    "service_worker": "background.js"
   },
   "commands": {
     "save-page": {
@@ -41,11 +40,5 @@
   "options_ui": {
     "page": "options/options.html",
     "open_in_tab": false
-  },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "stash@localhost",
-      "strict_min_version": "109.0"
-    }
   }
 }
