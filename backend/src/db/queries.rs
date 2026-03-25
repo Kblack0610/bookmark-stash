@@ -422,6 +422,7 @@ impl Database {
                     .ok()
             }),
             tags: Vec::new(), // Filled in by caller
+            folder_id: row.get("folder_id").unwrap_or(None),
         })
     }
 

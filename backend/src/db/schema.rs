@@ -3,8 +3,6 @@
 use super::DbResult;
 use rusqlite::Connection;
 
-const SCHEMA_VERSION: i32 = 1;
-
 /// Run all pending migrations
 pub fn migrate(conn: &Connection) -> DbResult<()> {
     // Check current version
@@ -21,8 +19,11 @@ pub fn migrate(conn: &Connection) -> DbResult<()> {
         )
         .unwrap_or(0);
 
-    if current_version < SCHEMA_VERSION {
+    if current_version < 1 {
         migrate_v1(conn)?;
+    }
+    if current_version < 2 {
+        migrate_v2(conn)?;
     }
 
     Ok(())
@@ -101,6 +102,35 @@ fn migrate_v1(conn: &Connection) -> DbResult<()> {
 
         -- Record migration version
         INSERT INTO schema_version (version) VALUES (1);
+        "#,
+    )?;
+
+    Ok(())
+}
+
+fn migrate_v2(conn: &Connection) -> DbResult<()> {
+    conn.execute_batch(
+        r#"
+        -- Folders table for organizing bookmarks
+        CREATE TABLE IF NOT EXISTS folders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            parent_id INTEGER REFERENCES folders(id) ON DELETE CASCADE,
+            position INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+            UNIQUE(name, parent_id)
+        );
+
+        -- Add folder_id to bookmarks (nullable = unfiled)
+        ALTER TABLE bookmarks ADD COLUMN folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL;
+
+        -- Indexes for folder queries
+        CREATE INDEX IF NOT EXISTS idx_bookmarks_folder_id ON bookmarks(folder_id);
+        CREATE INDEX IF NOT EXISTS idx_folders_parent_id ON folders(parent_id);
+
+        -- Record migration version
+        INSERT INTO schema_version (version) VALUES (2);
         "#,
     )?;
 

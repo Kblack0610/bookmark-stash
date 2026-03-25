@@ -19,6 +19,14 @@ async function apiPatch(id, body) {
   return resp.json();
 }
 
+async function apiDelete(id) {
+  const serverUrl = await getServerUrl();
+  const resp = await fetch(`${serverUrl}/api/bookmarks/${id}`, {
+    method: 'DELETE',
+  });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+}
+
 // --- Save current page ---
 const saveBtn = document.getElementById('save-btn');
 const saveStatus = document.getElementById('save-status');
@@ -107,6 +115,11 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     const archiveBtn = items[selectedIndex].querySelector('.archive-btn');
     if (archiveBtn) archiveBtn.click();
+  } else if (e.key === 'd' && !searchInput.matches(':focus') && selectedIndex >= 0) {
+    // Delete selected
+    e.preventDefault();
+    const deleteBtn = items[selectedIndex].querySelector('.delete-btn');
+    if (deleteBtn) deleteBtn.click();
   } else if (e.key === '/' && !searchInput.matches(':focus')) {
     e.preventDefault();
     searchInput.focus();
@@ -232,7 +245,19 @@ function renderBookmarks(bookmarks) {
       loadBookmarks();
     });
 
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.title = 'Delete';
+    deleteBtn.textContent = '\u2715';
+    deleteBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!confirm(`Delete "${bm.title || bm.url}"?`)) return;
+      await apiDelete(bm.id);
+      loadBookmarks();
+    });
+
     actions.appendChild(archiveBtn);
+    actions.appendChild(deleteBtn);
     li.appendChild(content);
     li.appendChild(actions);
 

@@ -1,6 +1,6 @@
 //! Shared types for Stash - browser-first read-it-later system
 //!
-//! This crate contains all types shared between the backend API and frontend WASM app.
+//! This crate contains all types shared between the backend API and browser extension.
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -24,6 +24,7 @@ pub struct Bookmark {
     pub updated_at: DateTime<Utc>,
     pub read_at: Option<DateTime<Utc>>,
     pub tags: Vec<Tag>,
+    pub folder_id: Option<i64>,
 }
 
 /// Bookmark status
@@ -89,6 +90,7 @@ pub struct UpdateBookmarkRequest {
     pub is_favorite: Option<bool>,
     pub reading_progress: Option<f32>,
     pub tags: Option<Vec<String>>,
+    pub folder_id: Option<Option<i64>>,
 }
 
 /// Query parameters for listing bookmarks
@@ -97,6 +99,7 @@ pub struct ListBookmarksQuery {
     pub status: Option<BookmarkStatus>,
     pub is_favorite: Option<bool>,
     pub tag: Option<String>,
+    pub folder_id: Option<i64>,
     pub limit: Option<i32>,
     pub offset: Option<i32>,
 }
@@ -203,6 +206,35 @@ impl<T> ApiResponse<T> {
     pub fn error(error: ApiError) -> Self {
         Self::Error(error)
     }
+}
+
+/// A folder for organizing bookmarks
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Folder {
+    pub id: i64,
+    pub name: String,
+    pub parent_id: Option<i64>,
+    pub position: i32,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub bookmark_count: i32,
+    pub subfolder_count: i32,
+}
+
+/// Request to create a folder
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateFolderRequest {
+    pub name: String,
+    pub parent_id: Option<i64>,
+}
+
+/// Request to update a folder
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateFolderRequest {
+    pub name: Option<String>,
+    /// None = don't change, Some(None) = move to root, Some(Some(id)) = reparent
+    pub parent_id: Option<Option<i64>>,
+    pub position: Option<i32>,
 }
 
 /// Validate a URL string
