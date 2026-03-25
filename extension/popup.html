@@ -8,8 +8,30 @@
 </head>
 <body>
   <div id="app">
-    <div class="loading">Loading Stash...</div>
+    <header class="app-header">
+      <h1>Stash</h1>
+      <button id="save-btn" class="save-btn" title="Save current page">+ Save</button>
+    </header>
+
+    <div id="save-status" class="save-status" hidden></div>
+
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search bookmarks..." />
+    </div>
+
+    <nav class="filter-tabs">
+      <button class="filter-btn active" data-filter="unread">Unread</button>
+      <button class="filter-btn" data-filter="favorites">Favorites</button>
+      <button class="filter-btn" data-filter="archived">Archived</button>
+    </nav>
+
+    <main class="app-content">
+      <ul id="bookmark-list" class="bookmark-list"></ul>
+      <div id="empty-state" class="empty-state" hidden>
+        <p>No bookmarks found</p>
+      </div>
+    </main>
   </div>
-  <script type="module" src="popup.js"></script>
+  <script src="popup-ui.js"></script>
 </body>
 </html>

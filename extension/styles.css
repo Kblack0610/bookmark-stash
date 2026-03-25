@@ -95,6 +95,43 @@ body {
   font-weight: 600;
 }
 
+.save-btn {
+  padding: 6px 14px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.save-btn:hover {
+  background: var(--accent-hover);
+}
+
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.save-status {
+  padding: 8px 16px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.save-status.success {
+  background: rgba(74, 222, 128, 0.15);
+  color: var(--success);
+}
+
+.save-status.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--error);
+}
+
 .settings-btn {
   background: none;
   border: none;
