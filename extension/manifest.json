@@ -21,6 +21,13 @@
     "scripts": ["background.js"]
   },
   "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Period",
+        "mac": "Command+Period"
+      },
+      "description": "Open Stash popup"
+    },
     "save-page": {
       "description": "Save current page to Stash"
     }
