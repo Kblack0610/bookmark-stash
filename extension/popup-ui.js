@@ -236,11 +236,12 @@ function renderBookmarks(bookmarks) {
     li.appendChild(content);
     li.appendChild(actions);
 
-    // Click opens URL and marks as read
+    // Click opens URL and archives it
     li.addEventListener('click', async () => {
       extensionApi.tabs.create({ url: bm.url });
-      if (bm.status === 'unread') {
-        await apiPatch(bm.id, { status: 'read' });
+      if (bm.status !== 'archived') {
+        await apiPatch(bm.id, { status: 'archived' });
+        loadBookmarks();
       }
     });
 
