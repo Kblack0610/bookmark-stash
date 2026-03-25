@@ -5,6 +5,7 @@ use leptos::prelude::*;
 
 /// View mode for the app
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)]
 pub enum View {
     List,
     Reader(i64),

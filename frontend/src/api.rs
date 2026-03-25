@@ -1,4 +1,5 @@
 //! API client for communicating with the Stash backend
+#![allow(dead_code)]
 
 use gloo_net::http::{Request, RequestBuilder};
 use stash_shared::{
