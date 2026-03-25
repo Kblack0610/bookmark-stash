@@ -23,8 +23,8 @@
   "commands": {
     "_execute_action": {
       "suggested_key": {
-        "default": "Ctrl+Period",
-        "mac": "Command+Period"
+        "default": "Ctrl+Comma",
+        "mac": "Command+Comma"
       },
       "description": "Open Stash popup"
     },
