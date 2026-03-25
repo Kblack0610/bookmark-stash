@@ -244,13 +244,44 @@ body {
   transition: background 0.2s;
 }
 
-.bookmark-item:hover {
+.bookmark-item:hover,
+.bookmark-item.selected {
   background: var(--bg-secondary);
 }
 
-.bookmark-icon {
-  font-size: 20px;
+.bookmark-item.selected {
+  border-left: 3px solid var(--accent);
+  padding-left: 13px;
+}
+
+.bookmark-actions {
+  display: flex;
+  align-items: center;
   flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.bookmark-item:hover .bookmark-actions,
+.bookmark-item.selected .bookmark-actions {
+  opacity: 1;
+}
+
+.archive-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.archive-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
 }
 
 .bookmark-content {

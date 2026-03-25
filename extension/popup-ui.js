@@ -8,6 +8,17 @@ async function getServerUrl() {
   return result.serverUrl;
 }
 
+async function apiPatch(id, body) {
+  const serverUrl = await getServerUrl();
+  const resp = await fetch(`${serverUrl}/api/bookmarks/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return resp.json();
+}
+
 // --- Save current page ---
 const saveBtn = document.getElementById('save-btn');
 const saveStatus = document.getElementById('save-status');
@@ -38,7 +49,6 @@ saveBtn.addEventListener('click', async () => {
     saveStatus.hidden = false;
     saveBtn.textContent = 'Saved';
 
-    // Refresh list
     loadBookmarks();
 
     setTimeout(() => {
@@ -74,6 +84,48 @@ searchInput.addEventListener('input', () => {
   searchTimeout = setTimeout(() => loadBookmarks(), 300);
 });
 
+// --- Keyboard navigation ---
+let selectedIndex = -1;
+
+document.addEventListener('keydown', (e) => {
+  const items = bookmarkList.querySelectorAll('.bookmark-item');
+  if (!items.length) return;
+
+  if (e.key === 'ArrowDown' || (e.key === 'j' && !searchInput.matches(':focus'))) {
+    e.preventDefault();
+    selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+    updateSelection(items);
+  } else if (e.key === 'ArrowUp' || (e.key === 'k' && !searchInput.matches(':focus'))) {
+    e.preventDefault();
+    selectedIndex = Math.max(selectedIndex - 1, 0);
+    updateSelection(items);
+  } else if (e.key === 'Enter' && selectedIndex >= 0) {
+    e.preventDefault();
+    items[selectedIndex].click();
+  } else if (e.key === 'a' && !searchInput.matches(':focus') && selectedIndex >= 0) {
+    // Archive selected
+    e.preventDefault();
+    const archiveBtn = items[selectedIndex].querySelector('.archive-btn');
+    if (archiveBtn) archiveBtn.click();
+  } else if (e.key === '/' && !searchInput.matches(':focus')) {
+    e.preventDefault();
+    searchInput.focus();
+  } else if (e.key === 'Escape') {
+    searchInput.blur();
+    selectedIndex = -1;
+    updateSelection(items);
+  }
+});
+
+function updateSelection(items) {
+  items.forEach((item, i) => {
+    item.classList.toggle('selected', i === selectedIndex);
+  });
+  if (selectedIndex >= 0) {
+    items[selectedIndex].scrollIntoView({ block: 'nearest' });
+  }
+}
+
 // --- Load and render bookmarks ---
 const bookmarkList = document.getElementById('bookmark-list');
 const emptyState = document.getElementById('empty-state');
@@ -81,6 +133,7 @@ const emptyState = document.getElementById('empty-state');
 async function loadBookmarks() {
   const serverUrl = await getServerUrl();
   const query = searchInput.value.trim();
+  selectedIndex = -1;
 
   try {
     let bookmarks;
@@ -93,7 +146,6 @@ async function loadBookmarks() {
       let url = `${serverUrl}/api/bookmarks?limit=30`;
       if (currentFilter === 'unread') url += '&status=unread';
       else if (currentFilter === 'archived') url += '&status=archived';
-      else if (currentFilter === 'favorites') url += '&is_favorite=true';
 
       const resp = await fetch(url);
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -123,10 +175,7 @@ function renderBookmarks(bookmarks) {
   for (const bm of bookmarks) {
     const li = document.createElement('li');
     li.className = 'bookmark-item';
-
-    const icon = document.createElement('div');
-    icon.className = 'bookmark-icon';
-    icon.textContent = bm.is_favorite ? '\u2B50' : '\uD83D\uDCC4';
+    li.tabIndex = 0;
 
     const content = document.createElement('div');
     content.className = 'bookmark-content';
@@ -168,11 +217,31 @@ function renderBookmarks(bookmarks) {
       content.appendChild(tagsDiv);
     }
 
-    li.appendChild(icon);
-    li.appendChild(content);
+    // Action buttons
+    const actions = document.createElement('div');
+    actions.className = 'bookmark-actions';
 
-    li.addEventListener('click', () => {
+    const archiveBtn = document.createElement('button');
+    archiveBtn.className = 'archive-btn';
+    archiveBtn.title = bm.status === 'archived' ? 'Unarchive' : 'Archive';
+    archiveBtn.textContent = bm.status === 'archived' ? '\u21A9' : '\u2713';
+    archiveBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const newStatus = bm.status === 'archived' ? 'unread' : 'archived';
+      await apiPatch(bm.id, { status: newStatus });
+      loadBookmarks();
+    });
+
+    actions.appendChild(archiveBtn);
+    li.appendChild(content);
+    li.appendChild(actions);
+
+    // Click opens URL and marks as read
+    li.addEventListener('click', async () => {
       extensionApi.tabs.create({ url: bm.url });
+      if (bm.status === 'unread') {
+        await apiPatch(bm.id, { status: 'read' });
+      }
     });
 
     bookmarkList.appendChild(li);
