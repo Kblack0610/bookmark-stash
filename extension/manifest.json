@@ -23,7 +23,7 @@
   "commands": {
     "save-page": {
       "suggested_key": {
-        "default": "Ctrl+Shift+S",
+        "default": "Alt+Shift+S",
         "mac": "Command+Shift+S"
       },
       "description": "Save current page to Stash"
