@@ -5,11 +5,15 @@
   "scripts": {
     "prepare:chromium": "bash ./scripts/prepare-chromium-extension.sh",
     "prepare:firefox": "bash ./scripts/prepare-firefox-extension.sh",
+    "lint:ext": "web-ext lint --source-dir extension/",
+    "build:xpi": "web-ext build --source-dir extension/ --artifacts-dir web-ext-artifacts --overwrite-dest",
+    "sign:firefox": "bash ./scripts/sign-firefox.sh",
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug"
   },
   "devDependencies": {
-    "@playwright/test": "^1.40.0"
+    "@playwright/test": "^1.40.0",
+    "web-ext": "^8.0.0"
   }
 }
